@@ -111,7 +111,7 @@ SELECT 'Cortex AI Demo Framework setup complete! Now upload the Streamlit files 
 SHOW DATABASES LIKE 'AI_FRAMEWORK_DB';
 
 -- Instructions for next steps:
--- 1. Upload the 5 Streamlit Python files and environment.yml to their respective stages
+-- 1. Upload the 5 Streamlit Python files to their respective stages
 -- 2. Upload ai_framework_semantic_model.yaml to the FRAMEWORK_YAML_STAGE
 -- 3. Download and import cortex_ai_demo_framework_setup.ipynb using Snowsight's Import .ipynb file feature
 -- 4. Run the imported notebook to create the Streamlit applications and complete the setup
