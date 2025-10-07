@@ -81,6 +81,11 @@ USE SCHEMA CONFIGS;
 CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.CONFIGS.FRAMEWORK_YAML_STAGE
     COMMENT = 'Stage for YAML configuration files';
 
+-- Single stage for all Streamlit applications and environment file
+USE SCHEMA APPS;
+CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.APPS.AI_FRAMEWORK_APPS
+    COMMENT = 'Single stage for all Streamlit applications and environment.yml';
+
 -- File formats (matching original)
 CREATE OR REPLACE FILE FORMAT AI_FRAMEWORK_DB.CONFIGS.YAML_CSV_FORMAT
     TYPE = 'CSV'
@@ -111,7 +116,13 @@ SELECT 'Cortex AI Demo Framework setup complete! Now upload the Streamlit files 
 SHOW DATABASES LIKE 'AI_FRAMEWORK_DB';
 
 -- Instructions for next steps:
--- 1. Upload the 5 Streamlit Python files to their respective stages
+-- 1. Upload all files to AI_FRAMEWORK_APPS stage:
+--    - 01_ai_framework_synthetic_data_generator.py
+--    - 02_ai_framework_structured_tables.py
+--    - 03_ai_framework_sql_to_yaml_converter.py
+--    - 04_ai_framework_snow_demo.py
+--    - 05_ai_framework_snow_viz.py
+--    - environment.yml
 -- 2. Upload ai_framework_semantic_model.yaml to the FRAMEWORK_YAML_STAGE
 -- 3. Download and import cortex_ai_demo_framework_setup.ipynb using Snowsight's Import .ipynb file feature
 -- 4. Run the imported notebook to create the Streamlit applications and complete the setup
