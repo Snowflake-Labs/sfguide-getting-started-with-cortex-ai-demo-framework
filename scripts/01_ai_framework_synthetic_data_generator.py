@@ -909,11 +909,13 @@ if session:
     company_name = st.sidebar.text_input(
         "Company Name", 
         value=loaded_config.get('company_name', 'Acme Corp'), 
+        key="company_name",
         help="Name of the company for context"
     )
     topic = st.sidebar.text_input(
         "Topic/Domain", 
         value=loaded_config.get('topic', 'Customer Orders'), 
+        key="topic",
         help="The domain or topic for the synthetic data"
     )
     
@@ -926,6 +928,7 @@ if session:
     fields_input = st.sidebar.text_area(
         "Fields (one per line)", 
         value='\n'.join(default_fields) if isinstance(default_fields, list) else default_fields,
+        key="fields_input",
         help="Enter field names, one per line"
     )
     fields = [field.strip() for field in fields_input.split('\n') if field.strip()]
@@ -937,12 +940,14 @@ if session:
         min_value=10, max_value=200, 
         value=loaded_config.get('batch_size', 100), 
         step=10,
+        key="batch_size",
         help="Number of records to generate in each batch (smaller batches are more reliable)"
     )
     num_batches = st.sidebar.slider(
         "Number of Batches", 
         min_value=1, max_value=1000, 
         value=loaded_config.get('num_batches', 10),
+        key="num_batches",
         help="How many batches to generate"
     )
     
@@ -1064,9 +1069,10 @@ if session:
             system_prompt, user_prompt = generate_default_prompts(company_name, topic, fields, batch_size)
             st.session_state.system_prompt = system_prompt
             st.session_state.user_prompt = user_prompt
+            st.success("✅ Prompts generated! Check the text areas below.")
         
         # Use loaded prompt if available, otherwise use session state
-        current_system_prompt = loaded_config.get('system_prompt', st.session_state.system_prompt)
+        current_system_prompt = loaded_config.get('system_prompt') or st.session_state.system_prompt
         system_prompt_edited = st.text_area(
             "System Prompt",
             value=current_system_prompt,
@@ -1077,7 +1083,7 @@ if session:
     with col2:
         st.subheader("User Prompt")
         # Use loaded prompt if available, otherwise use session state
-        current_user_prompt = loaded_config.get('user_prompt', st.session_state.user_prompt)
+        current_user_prompt = loaded_config.get('user_prompt') or st.session_state.user_prompt
         user_prompt_edited = st.text_area(
             "User Prompt",
             value=current_user_prompt,
