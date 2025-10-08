@@ -112,8 +112,6 @@ CREATE OR REPLACE FILE FORMAT AI_FRAMEWORK_DB.CONFIGS.JSON_FORMAT
 SELECT CURRENT_ROLE() AS current_role, CURRENT_DATABASE() AS current_database;
 SELECT 'Cortex AI Demo Framework setup complete! Now upload the Streamlit files to their respective stages and run the notebook.' AS status;
 
--- Verify databases are owned by cortex_ai_demo_data_scientist
-SHOW DATABASES LIKE 'AI_FRAMEWORK_DB';
 
 -- Instructions for next steps:
 -- 1. Upload all files to AI_FRAMEWORK_APPS stage:
