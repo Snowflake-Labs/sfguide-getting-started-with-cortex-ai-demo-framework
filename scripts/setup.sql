@@ -121,7 +121,8 @@ SHOW DATABASES LIKE 'AI_FRAMEWORK_DB';
 --    - 02_ai_framework_structured_tables.py
 --    - 03_ai_framework_sql_to_yaml_converter.py
 --    - 04_ai_framework_snow_demo.py
---    - 05_ai_framework_snow_viz.py
+--    - 05_ai_framework_snow_viz_yaml_wizard.py
+--    - 06_ai_framework_snow_viz.py
 --    - environment.yml
 -- 2. Upload ai_framework_semantic_model.yaml to the FRAMEWORK_YAML_STAGE
 -- 3. Download and import cortex_ai_demo_framework_setup.ipynb using Snowsight's Import .ipynb file feature
@@ -131,16 +132,15 @@ SHOW DATABASES LIKE 'AI_FRAMEWORK_DB';
 -- TEARDOWN SCRIPT (Uncomment lines below to clean up all resources)
 -- ============================================================================
 
--- Cortex AI Demo Framework Teardown Script
--- Uncomment and run these lines to remove all objects created during the quickstart
-
 -- USE ROLE ACCOUNTADMIN;
 
 -- USE DATABASE SNOWFLAKE;
 -- USE SCHEMA INFORMATION_SCHEMA;
 
--- DROP DATABASE IF EXISTS AI_FRAMEWORK_DB;
--- DROP ROLE IF EXISTS cortex_ai_demo_data_scientist;
+-- DROP DATABASE IF EXISTS AI_FRAMEWORK_DB CASCADE;
+-- DROP DATABASE IF EXISTS SNOWFLAKE_INTELLIGENCE CASCADE;
 
 -- DROP WAREHOUSE IF EXISTS cortex_ai_demo_wh;
 -- DROP WAREHOUSE IF EXISTS cortex_ai_synthetic_data_wh;
+
+-- DROP ROLE IF EXISTS cortex_ai_demo_data_scientist;
