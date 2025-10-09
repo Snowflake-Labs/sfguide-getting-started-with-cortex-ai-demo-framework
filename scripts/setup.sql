@@ -81,6 +81,11 @@ USE SCHEMA CONFIGS;
 CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.CONFIGS.FRAMEWORK_YAML_STAGE
     COMMENT = 'Stage for YAML configuration files';
 
+-- Visualization YAML stage for Snow Viz dashboard configurations
+CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE
+    COMMENT = 'Stage for Snow Viz dashboard YAML configuration files'
+    DIRECTORY = (ENABLE = TRUE);
+
 -- Single stage for all Streamlit applications and environment file
 USE SCHEMA APPS;
 CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.APPS.AI_FRAMEWORK_APPS
