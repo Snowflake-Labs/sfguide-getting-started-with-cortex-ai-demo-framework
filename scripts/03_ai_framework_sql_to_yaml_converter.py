@@ -1566,25 +1566,35 @@ if 'parsed_blocks' in st.session_state:
         st.markdown(f"""
         **Next Steps:**
         1. Download the YAML file above
-        2. Upload it to your Snowflake stage: `@{current_db}.CONFIGS.FRAMEWORK_YAML_STAGE/{{area}}/`
+        2. **Upload to your Snowflake stage** with a project directory name
         3. Open your SNOW-DEMO harness
-        4. Select the area and your new demo configuration
+        4. Select your project area and demo configuration
         5. Run your interactive demo!
         """)
         
         # Stage upload SQL (for reference)
-        with st.expander("📋 Stage Upload SQL Commands"):
+        with st.expander("📋 Complete Upload Instructions"):
             # Get current database from session context
             dataops_db = get_current_database()
-            upload_sql = f"""
--- Upload the YAML file to your stage
--- Replace 'your_area' with your demo area (e.g., 'analytics', 'geospatial', etc.)
-PUT file://path/to/{suggested_filename} @{dataops_db}.CONFIGS.FRAMEWORK_YAML_STAGE/your_area/;
+            upload_instructions = f"""
+💡 **Project Directory Tips:**
 
--- Verify the upload
-LIST @{dataops_db}.CONFIGS.FRAMEWORK_YAML_STAGE/your_area/;
+Create a meaningful directory name that matches your use case:
+
+- **analytics** - Customer analytics, sales analysis
+- **geospatial** - Location-based demos  
+- **ml_demos** - Machine learning showcases
+- **financial** - Finance use cases
+- **retail** - E-commerce demos
+
+🖱️ **Snowsight UI:**
+
+1. Navigate to FRAMEWORK_YAML_STAGE
+2. Click "Upload" → Select your YAML file  
+3. In path field, type: `/analytics` (or your project name)
+4. Click "Upload" - directory created automatically!
 """
-            st.code(upload_sql, language='sql')
+            st.markdown(upload_instructions)
 
 # Footer
 st.markdown("---")
