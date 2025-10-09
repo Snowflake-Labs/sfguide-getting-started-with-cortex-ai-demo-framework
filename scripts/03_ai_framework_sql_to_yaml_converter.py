@@ -1556,10 +1556,17 @@ if 'parsed_blocks' in st.session_state:
         
         # Upload instructions
         st.subheader("📤 Upload Instructions")
-        st.markdown("""
+        
+        # Get current database for instructions
+        try:
+            current_db = get_current_database()
+        except:
+            current_db = "AI_FRAMEWORK_DB"  # Fallback if function fails
+            
+        st.markdown(f"""
         **Next Steps:**
         1. Download the YAML file above
-        2. Upload it to your Snowflake stage: `@{get_current_database()}.CONFIGS.FRAMEWORK_YAML_STAGE/{area}/`
+        2. Upload it to your Snowflake stage: `@{current_db}.CONFIGS.FRAMEWORK_YAML_STAGE/{{area}}/`
         3. Open your SNOW-DEMO harness
         4. Select the area and your new demo configuration
         5. Run your interactive demo!
