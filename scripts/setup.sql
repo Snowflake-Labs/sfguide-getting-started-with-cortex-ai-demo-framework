@@ -79,7 +79,8 @@ USE SCHEMA CONFIGS;
 
 -- Framework YAML stage for configuration files
 CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.CONFIGS.FRAMEWORK_YAML_STAGE
-    COMMENT = 'Stage for YAML configuration files';
+    COMMENT = 'Stage for YAML configuration files'
+    DIRECTORY = (ENABLE = TRUE);
 
 -- Visualization YAML stage for Snow Viz dashboard configurations
 CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE
