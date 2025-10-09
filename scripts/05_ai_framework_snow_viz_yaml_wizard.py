@@ -1613,13 +1613,34 @@ col1, col2, col3 = st.columns(3)
 with col1:
     dbs = list_databases()
     saved_db = st.session_state.get("svw_saved_db")
-    db_default_index = (dbs.index(saved_db) if (saved_db in dbs) else 0) if dbs else None
+    
+    # Smart default: prioritize AI_FRAMEWORK_DB if available
+    db_default_index = 0  # fallback
+    if dbs:
+        if "AI_FRAMEWORK_DB" in dbs:
+            db_default_index = dbs.index("AI_FRAMEWORK_DB")
+        elif saved_db in dbs:
+            db_default_index = dbs.index(saved_db)
+    
     db = st.selectbox("Database", options=dbs, index=db_default_index)
 with col2:
     if db:
         schemas = list_schemas(db)
         saved_sc = st.session_state.get("svw_saved_schema")
-        sc_default_index = (schemas.index(saved_sc) if (saved_sc in schemas) else 0) if schemas else None
+        
+        # Smart default: prioritize data schemas over config schemas
+        sc_default_index = 0  # fallback
+        if schemas:
+            # Priority order: saved > SILVER_LAYER > BRONZE_LAYER > CONFIGS > first
+            if saved_sc in schemas:
+                sc_default_index = schemas.index(saved_sc)
+            elif "SILVER_LAYER" in schemas:
+                sc_default_index = schemas.index("SILVER_LAYER")
+            elif "BRONZE_LAYER" in schemas:
+                sc_default_index = schemas.index("BRONZE_LAYER")
+            elif "CONFIGS" in schemas:
+                sc_default_index = schemas.index("CONFIGS")
+        
         sc = st.selectbox("Schema", options=schemas, index=sc_default_index)
     else:
         sc = None
