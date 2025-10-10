@@ -798,8 +798,14 @@ def render_yaml_generation_tab(session, db: str, sc: str, selected_name: str, di
         # Use customized YAML if available
         yaml_to_download = st.session_state.get("svw_yaml_text", "")
         if yaml_to_download:
-            st.download_button("📥 Download YAML", yaml_to_download.encode("utf-8"), file_name=filename, mime="text/yaml")
-            st.success("✅ YAML ready for download and agent creation")
+            st.subheader("📥 Download YAML")
+            st.download_button(
+                label="📥 Download YAML Configuration",
+                data=yaml_to_download.encode("utf-8"),
+                file_name=filename,
+                mime="text/yaml",
+                help="Download the generated YAML file to upload to VISUALIZATION_YAML_STAGE"
+            )
         else:
             st.info("👆 Generate your customized YAML first")
             
@@ -870,6 +876,44 @@ def render_yaml_generation_tab(session, db: str, sc: str, selected_name: str, di
                 st.info("💡 **Config Saved**: You can now use the Intelligence tab to create an agent, or download your YAML file above.")
                 
     st.info("💡 Configure search service and create agent in the Intelligence tab")
+    
+    # Upload instructions (full width, outside columns)
+    yaml_to_download = st.session_state.get("svw_yaml_text", "")
+    if yaml_to_download:
+        st.subheader("📤 Upload Instructions")
+        
+        with st.expander("📋 Complete Upload Instructions", expanded=True):
+            upload_instructions = f"""
+**Next Steps:**
+1. Download the YAML file above
+2. Upload to **AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE** with a project directory
+3. Open Snow Viz (Step 6) and select your project
+4. View your interactive dashboard!
+
+---
+
+💡 **Project Directory Tips:**
+
+Create a meaningful directory name that matches your use case:
+
+- **techcorp_orders** - Customer order dashboards
+- **analytics** - General analytics dashboards
+- **sales** - Sales performance tracking
+- **customer_insights** - Customer behavior analysis
+- **financial** - Financial reporting
+
+---
+
+🖱️ **Snowsight UI Upload:**
+
+1. Navigate to **AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE**
+2. Click "Upload" → Select your YAML file  
+3. In path field, type: `techcorp_orders` (or your project name)
+4. Click "Upload" - directory created automatically!
+
+💡 **Done!** Your dashboard is ready for Snow Viz (Step 6)
+"""
+            st.markdown(upload_instructions)
 
     st.markdown("---")
 
