@@ -1589,7 +1589,7 @@ Create a meaningful directory name that matches your use case:
 
 🖱️ **Snowsight UI:**
 
-1. Navigate to FRAMEWORK_YAML_STAGE
+1. Navigate to **{current_db}.CONFIGS.FRAMEWORK_YAML_STAGE**
 2. Click "Upload" → Select your YAML file  
 3. In path field, type: `/analytics` (or your project name)
 4. Click "Upload" - directory created automatically!
