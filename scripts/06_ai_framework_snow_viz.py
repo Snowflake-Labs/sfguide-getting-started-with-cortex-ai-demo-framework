@@ -101,10 +101,7 @@ def get_current_database():
 # DataOps database configuration - use current database context
 db_name = get_current_database()
 
-# Primary stage for Snow Viz YAML files
 STAGE_BASE = f"@{db_name}.CONFIGS.VISUALIZATION_YAML_STAGE"
-# Fallback stage for backward compatibility with SQL to YAML Converter
-FRAMEWORK_STAGE = f"@{db_name}.CONFIGS.FRAMEWORK_YAML_STAGE"
 YAML_FORMAT = f"{db_name}.CONFIGS.YAML_CSV_FORMAT"
 
 # Lightweight caches to avoid stage listing/query churn on UI interactions
@@ -119,52 +116,26 @@ def _cached_list(stage_path: str) -> pd.DataFrame:
 def list_projects_in_stage() -> List[str]:
     if session is None:
         return []
-    
-    projects = set()
-    
-    # Check primary VISUALIZATION_YAML_STAGE
     files_df = _cached_list(STAGE_BASE)
-    if not files_df.empty:
-        file_col = files_df.columns[0]
-        prefix = "VISUALIZATION_YAML_STAGE/"
-        paths = [row[file_col] for _, row in files_df.iterrows()]
-        for p in paths:
-            idx = p.lower().find(prefix.lower())
-            if idx >= 0:
-                trimmed = p[idx + len(prefix):]
-                if '/' in trimmed:
-                    projects.add(trimmed.split('/')[0])
-    
-    # Check fallback FRAMEWORK_YAML_STAGE for backward compatibility
-    framework_df = _cached_list(FRAMEWORK_STAGE)
-    if not framework_df.empty:
-        file_col = framework_df.columns[0]
-        prefix = "FRAMEWORK_YAML_STAGE/"
-        paths = [row[file_col] for _, row in framework_df.iterrows()]
-        for p in paths:
-            idx = p.lower().find(prefix.lower())
-            if idx >= 0:
-                trimmed = p[idx + len(prefix):]
-                if '/' in trimmed:
-                    # Add framework projects with a prefix to distinguish them
-                    projects.add(f"📁 {trimmed.split('/')[0]} (from framework)")
-    
-    return sorted(list(projects))
+    if files_df.empty:
+        return []
+    file_col = files_df.columns[0]
+    prefix = "VISUALIZATION_YAML_STAGE/"
+    paths = [row[file_col] for _, row in files_df.iterrows()]
+    # Keep after the stage root
+    trimmed = []
+    for p in paths:
+        idx = p.lower().find(prefix.lower())
+        if idx >= 0:
+            trimmed.append(p[idx + len(prefix):])
+    projects = sorted({p.split('/')[0] for p in trimmed if '/' in p})
+    return projects
 
 
 def list_yaml_files_in_project(project: str) -> List[str]:
     if session is None or not project:
         return []
-    
-    # Handle framework projects (with prefix)
-    if project.startswith("📁 ") and "(from framework)" in project:
-        # Extract the actual project name
-        actual_project = project.replace("📁 ", "").replace(" (from framework)", "")
-        df = _cached_list(f"{FRAMEWORK_STAGE}/{actual_project}")
-    else:
-        # Regular visualization stage project
-        df = _cached_list(f"{STAGE_BASE}/{project}")
-    
+    df = _cached_list(f"{STAGE_BASE}/{project}")
     if df.empty:
         return []
     file_col = df.columns[0]
@@ -175,24 +146,12 @@ def list_yaml_files_in_project(project: str) -> List[str]:
 def load_yaml_from_stage(project: str, filename: str) -> Dict[str, Any]:
     if session is None:
         raise RuntimeError("No Snowflake session; cannot read from stage.")
-    
-    # Determine which stage to use based on project name
-    if project.startswith("📁 ") and "(from framework)" in project:
-        # Framework stage project
-        actual_project = project.replace("📁 ", "").replace(" (from framework)", "")
-        stage_base = FRAMEWORK_STAGE
-        leaf = stage_base.replace("@", "").split(".")[-1]
-    else:
-        # Regular visualization stage project
-        actual_project = project
-        stage_base = STAGE_BASE
-        leaf = stage_base.replace("@", "").split(".")[-1]
-    
     # Defensive: remove duplicated stage leaf if present in filename
+    leaf = STAGE_BASE.replace("@", "").split(".")[-1]
+    # filename might include full 'VISUALIZATION_YAML_STAGE/...' – strip it
     if filename.lower().startswith(f"{leaf.lower()}/"):
         filename = filename[len(leaf) + 1:]
-    
-    full_path = f"{stage_base}/{actual_project}/{filename.split('/')[-1]}"
+    full_path = f"{STAGE_BASE}/{project}/{filename.split('/')[-1]}"
     df = session.sql(
         f"SELECT $1 FROM {full_path} (file_format => '{YAML_FORMAT}')"
     ).to_pandas()
