@@ -1230,8 +1230,11 @@ demo_overview = st.text_area(
     placeholder="Brief description of what this demo covers...\n- Key feature 1\n- Key feature 2\n- Key feature 3"
 )
 
+# Important note before Advanced Options
+st.header("⚠️ Required: Select how your SQL statements are separated")
+
 # Advanced options
-with st.expander("⚙️ Advanced Options"):
+with st.expander("⚙️ Advanced Options", expanded=True):
     col1, col2 = st.columns(2)
     
     with col1:
@@ -1243,8 +1246,8 @@ with st.expander("⚙️ Advanced Options"):
                                       placeholder="Leave blank to auto-detect")
         
     with col2:
-        separator_options = ["GO", "Semicolon (;)", "Double Dash (--)", "Custom"]
-        current_separator = st.session_state.get('form_block_separator', 'GO')
+        separator_options = ["Semicolon (;)", "GO", "Double Dash (--)", "Custom"]
+        current_separator = st.session_state.get('form_block_separator', 'Semicolon (;)')
         try:
             separator_index = separator_options.index(current_separator)
         except ValueError:
@@ -1254,7 +1257,7 @@ with st.expander("⚙️ Advanced Options"):
             "SQL Block Separator",
             separator_options,
             index=separator_index,
-            help="How to split your SQL into separate steps"
+            help="How to split your SQL into separate steps. Most SQL files use semicolons (;) to end each statement."
         )
         
         custom_separator = ""
@@ -1573,7 +1576,7 @@ if 'parsed_blocks' in st.session_state:
         """)
         
         # Stage upload SQL (for reference)
-        with st.expander("📋 Complete Upload Instructions"):
+        with st.expander("📋 Complete Upload Instructions", expanded=True):
             # Get current database from session context
             dataops_db = get_current_database()
             upload_instructions = f"""
