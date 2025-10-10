@@ -1532,18 +1532,18 @@ if 'parsed_blocks' in st.session_state:
             
             st.markdown("---")
         
-        # Generate filename
+        # Generate filename from title (clean and simple)
         demo_meta = st.session_state['demo_metadata']
-        filename_parts = []
-        if demo_meta.get('topic'):
-            filename_parts.append(demo_meta['topic'].lower().replace(' ', '_'))
-        if demo_meta.get('sub_topic'):
-            filename_parts.append(demo_meta['sub_topic'].lower().replace(' ', '_'))
-        if demo_meta.get('title'):
-            filename_parts.append(demo_meta['title'].lower().replace(' ', '_'))
         
-        if filename_parts:
-            suggested_filename = "_".join(filename_parts) + ".yaml"
+        if demo_meta.get('title'):
+            # Clean the title: remove special chars, convert to lowercase, replace spaces with underscores
+            clean_title = demo_meta['title'].lower()
+            # Remove/replace special characters
+            clean_title = clean_title.replace(',', '').replace(':', '').replace('-', '_')
+            # Replace multiple spaces with single space, then spaces with underscores
+            clean_title = ' '.join(clean_title.split())
+            clean_title = clean_title.replace(' ', '_')
+            suggested_filename = f"{clean_title}.yaml"
         else:
             suggested_filename = f"demo_config_{datetime.now().strftime('%Y%m%d_%H%M%S')}.yaml"
         
