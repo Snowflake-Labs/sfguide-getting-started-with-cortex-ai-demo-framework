@@ -1653,6 +1653,15 @@ if mode == "Modify existing" and session is not None:
         st.info("No saved configurations found.")
 
 st.markdown("### Source Selection")
+
+# 📘 Schema Selection Guidance
+st.info("""
+**💡 Which schema should I use?**
+- **SILVER_LAYER**: If you completed Step 2 (Structured Tables) - your data is now in structured tables
+- **BRONZE_LAYER**: If you skipped Step 2 - query raw data directly from the bronze layer
+- **CONFIGS**: For saved configuration files (YAML, metadata) - not typically used for data queries
+""")
+
 col1, col2, col3 = st.columns(3)
 with col1:
     dbs = list_databases()

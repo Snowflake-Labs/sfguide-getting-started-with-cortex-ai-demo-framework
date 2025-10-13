@@ -1069,7 +1069,12 @@ if session:
             system_prompt, user_prompt = generate_default_prompts(company_name, topic, fields, batch_size)
             st.session_state.system_prompt = system_prompt
             st.session_state.user_prompt = user_prompt
+            # Clear loaded config prompts so new prompts are displayed
+            if 'loaded_config' in st.session_state and st.session_state.loaded_config:
+                st.session_state.loaded_config.pop('system_prompt', None)
+                st.session_state.loaded_config.pop('user_prompt', None)
             st.success("✅ Prompts generated! Check the text areas below.")
+            st.rerun()  # Force rerun to display new prompts
         
         # Use loaded prompt if available, otherwise use session state
         current_system_prompt = loaded_config.get('system_prompt') or st.session_state.system_prompt
