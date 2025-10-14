@@ -972,7 +972,7 @@ if session:
     batch_size = st.sidebar.slider(
         "Records per Batch", 
         min_value=10, max_value=200, 
-        value=loaded_config.get('batch_size', 100), 
+        value=loaded_config.get('batch_size', 10), 
         step=10,
         key="batch_size",
         help="Number of records to generate in each batch (smaller batches are more reliable)"
