@@ -57,7 +57,10 @@ def generate_enhanced_tabs(dimensions: List[str], metric_defs: List[Dict], time_
     
     # 3. VS Comparison (third - head-to-head analysis)
     # Always create VS tab, even if no dimensions selected yet
-    tabs.append({
+    # Choose default compare dimension if available (first selected dimension)
+    default_dim = safe_dimensions[0] if safe_dimensions else None
+
+    vs_tab = {
             "key": "vs",
             "type": "compare",
             "title": "VS",
@@ -68,7 +71,10 @@ def generate_enhanced_tabs(dimensions: List[str], metric_defs: List[Dict], time_
                 "type": "line",
                 "default_grain": default_grain
             }
-        })
+        }
+    if default_dim:
+        vs_tab["dimension"] = default_dim
+    tabs.append(vs_tab)
     
     # 4. Top N (fourth - ranked analysis)
     tabs.append({
@@ -1653,15 +1659,6 @@ if mode == "Modify existing" and session is not None:
         st.info("No saved configurations found.")
 
 st.markdown("### Source Selection")
-
-# 📘 Schema Selection Guidance
-st.info("""
-**💡 Which schema should I use?**
-- **SILVER_LAYER**: If you completed Step 2 (Structured Tables) - your data is now in structured tables
-- **BRONZE_LAYER**: If you skipped Step 2 - query raw data directly from the bronze layer
-- **CONFIGS**: For saved configuration files (YAML, metadata) - not typically used for data queries
-""")
-
 col1, col2, col3 = st.columns(3)
 with col1:
     dbs = list_databases()
