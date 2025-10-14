@@ -87,6 +87,12 @@ CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE
     COMMENT = 'Stage for Snow Viz dashboard YAML configuration files'
     DIRECTORY = (ENABLE = TRUE);
 
+-- Semantic models stage for Cortex Analyst (in SILVER_LAYER for data access)
+USE SCHEMA SILVER_LAYER;
+CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.SILVER_LAYER.SEMANTIC_MODELS
+    COMMENT = 'Stage for Cortex Analyst semantic model YAML files'
+    DIRECTORY = (ENABLE = TRUE);
+
 -- Single stage for all Streamlit applications and environment file
 USE SCHEMA APPS;
 CREATE OR REPLACE STAGE AI_FRAMEWORK_DB.APPS.AI_FRAMEWORK_APPS
