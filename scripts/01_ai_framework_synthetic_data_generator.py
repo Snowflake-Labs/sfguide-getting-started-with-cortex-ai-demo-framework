@@ -218,6 +218,18 @@ def generate_default_prompts(company_name: str, topic: str, fields: List[str], b
     
     fields_str = ", ".join(fields)
     
+    # Check if any fields contain date/time keywords
+    date_keywords = ['date', 'time', 'timestamp', 'datetime', 'dt']
+    has_date_fields = any(
+        any(keyword in field.lower() for keyword in date_keywords)
+        for field in fields
+    )
+    
+    # Identify specific date fields for the user prompt
+    date_fields = [field for field in fields 
+                   if any(keyword in field.lower() for keyword in date_keywords)]
+    
+    # Base system prompt
     system_prompt = f"""You are a synthetic data generator that creates realistic, diverse datasets for testing and development purposes.
 
 Your task is to generate {batch_size} records of synthetic data for {company_name} related to {topic}.
@@ -230,15 +242,37 @@ Requirements:
 - Do not include any explanatory text, only return the JSON array
 - Use appropriate data types for each field
 - Make sure the data is relevant to the company and topic context
-- Ensure each batch has unique data that doesn't repeat previous batches
+- Ensure each batch has unique data that doesn't repeat previous batches"""
+    
+    # Add date formatting instructions if date fields detected
+    if has_date_fields:
+        system_prompt += f"""
+
+IMPORTANT - DATE FORMATTING:
+- For any date/time fields ({', '.join(date_fields)}), use ONLY simple date format: YYYY-MM-DD
+- Examples: 2024-01-15, 2023-12-31, 2024-03-07
+- Do NOT use timestamps with time components (no T, no Z, no timezone)
+- Do NOT use ISO 8601 format with time
+- Ensure all dates are valid (days 1-31, months 1-12, proper year)"""
+    
+    system_prompt += f"""
 
 Fields to include: {fields_str}
 
 Return the data as a JSON array of objects, with each object representing one record."""
 
+    # Base user prompt
     user_prompt = f"""Generate {batch_size} synthetic records for {company_name} focusing on {topic}. 
 
-Each record should include these fields: {fields_str}
+Each record should include these fields: {fields_str}"""
+    
+    # Add date reminder to user prompt if date fields detected
+    if has_date_fields:
+        user_prompt += f"""
+
+CRITICAL: For date fields ({', '.join(date_fields)}), use ONLY YYYY-MM-DD format (e.g., 2024-01-15). No timestamps or timezones."""
+    
+    user_prompt += """
 
 Return only a valid JSON array with no additional text or formatting."""
 
