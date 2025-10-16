@@ -547,7 +547,7 @@ with col2:
     target_table = st.text_input(
         "Enter name for structured table:",
         value=f"{source_table}_STRUCTURED" if source_table else "",
-        help="Name for the new structured table (e.g., QUALTRICS_REVIEWS_BULLS)"
+        help="Name for the new structured table (e.g., CUSTOMER_ORDERS_STRUCTURED)"
     )
 
 # Company and Topic selection
