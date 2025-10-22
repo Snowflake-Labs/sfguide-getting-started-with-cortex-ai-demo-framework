@@ -832,7 +832,7 @@ def render_yaml_generation_tab(session, db: str, sc: str, selected_name: str, di
         else:
             st.success(f"✅ Ready to save: {dim_customs_count} dimension + {met_customs_count} metric customizations")
         
-        if st.button("💾 Save to AI_FRAMEWORK_DB.CONFIGS"):
+        if st.button("💾 Save to CORTEX_AI_FRAMEWORK_DB.CONFIGS"):
             selected_metric_keys = [m["key"] for m in metric_defs]
             
             # Get current customizations
@@ -892,7 +892,7 @@ def render_yaml_generation_tab(session, db: str, sc: str, selected_name: str, di
             upload_instructions = f"""
 **Next Steps:**
 1. Download the YAML file above
-2. Upload to **AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE** with a project directory
+2. Upload to **CORTEX_AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE** with a project directory
 3. Open Snow Viz (Step 6) and select your project
 4. View your interactive dashboard!
 
@@ -912,7 +912,7 @@ Create a meaningful directory name that matches your use case:
 
 🖱️ **Snowsight UI Upload:**
 
-1. Navigate to **AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE**
+1. Navigate to **CORTEX_AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE**
 2. Click "Upload" → Select your YAML file  
 3. In path field, type: `techcorp_orders` (or your project name)
 4. Click "Upload" - directory created automatically!
@@ -1015,7 +1015,7 @@ def render_intelligence_tab(session, db: str, sc: str, selected_name: str, dimen
                 with st.expander(f"📋 Preview: {yaml_file_name}", expanded=False):
                     try:
                         # Get the YAML content from the stage (read all lines)
-                        get_file_sql = f"SELECT $1 FROM @{db.upper()}.{sc.upper()}.SEMANTIC_MODELS/{yaml_file_name} (FILE_FORMAT => 'AI_FRAMEWORK_DB.CONFIGS.YAML_CSV_FORMAT')"
+                        get_file_sql = f"SELECT $1 FROM @{db.upper()}.{sc.upper()}.SEMANTIC_MODELS/{yaml_file_name} (FILE_FORMAT => 'CORTEX_AI_FRAMEWORK_DB.CONFIGS.YAML_CSV_FORMAT')"
                         yaml_content = session.sql(get_file_sql).collect()
                         if yaml_content:
                             # Concatenate all rows to get complete YAML content
@@ -1332,19 +1332,19 @@ def _pick_name_column(df: pd.DataFrame, preferred: List[str]) -> Optional[str]:
 
 
 # =============================
-# Config persistence (AI_FRAMEWORK_DB)
+# Config persistence (CORTEX_AI_FRAMEWORK_DB)
 # =============================
 
 def setup_config_database(_sess) -> bool:
     if not _sess:
         return False
     try:
-        _sess.sql("CREATE DATABASE IF NOT EXISTS AI_FRAMEWORK_DB").collect()
-        _sess.sql("CREATE SCHEMA IF NOT EXISTS AI_FRAMEWORK_DB.CONFIGS").collect()
+        _sess.sql("CREATE DATABASE IF NOT EXISTS CORTEX_AI_FRAMEWORK_DB").collect()
+        _sess.sql("CREATE SCHEMA IF NOT EXISTS CORTEX_AI_FRAMEWORK_DB.CONFIGS").collect()
         # Create table with TEXT columns
         _sess.sql(
             """
-            CREATE TABLE IF NOT EXISTS AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS (
+            CREATE TABLE IF NOT EXISTS CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS (
                 CONFIG_ID STRING PRIMARY KEY,
                 CONFIG_NAME STRING,
                 SOURCE_DB STRING,
@@ -1360,7 +1360,7 @@ def setup_config_database(_sess) -> bool:
         ).collect()
         return True
     except Exception as e:
-        st.error(f"Error setting up AI_FRAMEWORK_DB.CONFIGS: {e}")
+        st.error(f"Error setting up CORTEX_AI_FRAMEWORK_DB.CONFIGS: {e}")
         return False
 
 
@@ -1374,7 +1374,7 @@ def save_config_to_database(_sess, config_name: str, source_db: str, source_sche
         cfg_id = str(uuid.uuid4())
         # Remove existing by name
         _sess.sql(
-            "DELETE FROM AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS WHERE CONFIG_NAME = ?",
+            "DELETE FROM CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS WHERE CONFIG_NAME = ?",
             [config_name]
         ).collect()
 
@@ -1384,7 +1384,7 @@ def save_config_to_database(_sess, config_name: str, source_db: str, source_sche
         
         _sess.sql(
             """
-            INSERT INTO AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS
+            INSERT INTO CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS
             (CONFIG_ID, CONFIG_NAME, SOURCE_DB, SOURCE_SCHEMA, SOURCE_OBJECT, COLUMN_INFO, YAML_TEXT, METADATA)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
@@ -1404,7 +1404,7 @@ def load_saved_configurations(_sess) -> List[Dict[str, Any]]:
         return []
     try:
         # Show what we're trying to query
-        query = "SELECT CONFIG_ID, CONFIG_NAME, SOURCE_DB, SOURCE_SCHEMA, SOURCE_OBJECT, LAST_UPDATED FROM AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS ORDER BY LAST_UPDATED DESC"
+        query = "SELECT CONFIG_ID, CONFIG_NAME, SOURCE_DB, SOURCE_SCHEMA, SOURCE_OBJECT, LAST_UPDATED FROM CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS ORDER BY LAST_UPDATED DESC"
         
         rows = _sess.sql(query).collect()
         configs = [r.as_dict() for r in rows]  # 🆕 FIXED: Use .as_dict() for Snowpark Row objects
@@ -1420,7 +1420,7 @@ def load_saved_configurations(_sess) -> List[Dict[str, Any]]:
     except Exception as e:
         # Show the actual error instead of hiding it
         st.error(f"❌ Error loading configurations: {str(e)}")
-        st.info("💡 Check if table AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS exists")
+        st.info("💡 Check if table CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS exists")
         return []
 
 
@@ -1433,7 +1433,7 @@ def load_config_from_database(_sess, config_id: str) -> Optional[Dict[str, Any]]
             """
             SELECT CONFIG_ID, CONFIG_NAME, SOURCE_DB, SOURCE_SCHEMA, SOURCE_OBJECT,
                    COLUMN_INFO, YAML_TEXT, METADATA, CREATED_TIMESTAMP, LAST_UPDATED
-            FROM AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS
+            FROM CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS
             WHERE CONFIG_ID = ?
             """,
             [config_id]
@@ -1606,13 +1606,13 @@ def classify_columns(cols: pd.DataFrame) -> Dict[str, List[str]]:
 st.markdown("""
 <div style='background: linear-gradient(to right, #1e40af, #0ea5e9); padding: 8px 12px; border-radius: 6px; margin-bottom: 10px;'>
   <h2 style='color: white; margin: 0;'>🧭 SnowViz YAML Wizard</h2>
-  <div style='color: #e0f2fe; font-size: 12px;'>Configs saved in AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS</div>
+  <div style='color: #e0f2fe; font-size: 12px;'>Configs saved in CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS</div>
 </div>
 """, unsafe_allow_html=True)
 
 # Setup config store
 if session is not None and setup_config_database(session):
-    st.success("Config store ready: AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS")
+    st.success("Config store ready: CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS")
 
 # Mode selection: create new or modify existing
 mode = st.radio("Mode", ["Create new", "Modify existing"], horizontal=True)
@@ -1921,7 +1921,7 @@ if db and sc and sel_idx is not None:
 
 # Saved configurations (reload)
 if session is not None:
-    st.markdown("### Saved Configurations (AI_FRAMEWORK_DB.CONFIGS)")
+    st.markdown("### Saved Configurations (CORTEX_AI_FRAMEWORK_DB.CONFIGS)")
     saved = load_saved_configurations(session)
     if saved:
         col_l, col_r = st.columns([3,1])
@@ -1968,9 +1968,9 @@ if session is not None:
         # Check if config table exists
         if session:
             try:
-                table_check = session.sql("SELECT COUNT(*) as total_configs FROM AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS").collect()
+                table_check = session.sql("SELECT COUNT(*) as total_configs FROM CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS").collect()
                 total = table_check[0]['TOTAL_CONFIGS'] if table_check else 0
                 st.info(f"💾 Configuration table has {total} saved configs")
             except Exception as e:
                 st.warning(f"⚠️ Cannot access config table")
-                st.info("💡 Make sure AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS table exists")
+                st.info("💡 Make sure CORTEX_AI_FRAMEWORK_DB.CONFIGS.SNOWVIZ_CONFIGURATIONS table exists")

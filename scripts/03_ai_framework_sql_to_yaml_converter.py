@@ -1564,7 +1564,7 @@ if 'parsed_blocks' in st.session_state:
         try:
             current_db = get_current_database()
         except:
-            current_db = "AI_FRAMEWORK_DB"  # Fallback if function fails
+            current_db = "CORTEX_AI_FRAMEWORK_DB"  # Fallback if function fails
             
         st.markdown(f"""
         **Next Steps:**
