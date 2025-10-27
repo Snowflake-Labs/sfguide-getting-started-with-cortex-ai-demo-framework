@@ -1559,37 +1559,19 @@ if 'parsed_blocks' in st.session_state:
             current_db = get_current_database()
         except:
             current_db = "CORTEX_AI_FRAMEWORK_DB"  # Fallback if function fails
-            
-        st.markdown(f"""
-        **Next Steps:**
-        1. Download the YAML file above
-        2. **Upload to your Snowflake stage** with a project directory name
-        3. Open your SNOW-DEMO harness
-        4. Select your project area and demo configuration
-        5. Run your interactive demo!
-        """)
-        
+                    
         # Stage upload SQL (for reference)
         with st.expander("📋 Complete Upload Instructions", expanded=True):
             # Get current database from session context
             dataops_db = get_current_database()
             upload_instructions = f"""
-💡 **Project Directory Tips:**
+**Snowsight UI:**
 
-Create a meaningful directory name that matches your use case:
-
-- **analytics** - Customer analytics, sales analysis
-- **geospatial** - Location-based demos  
-- **ml_demos** - Machine learning showcases
-- **financial** - Finance use cases
-- **retail** - E-commerce demos
-
-🖱️ **Snowsight UI:**
-
-1. Navigate to **{current_db}.CONFIGS.FRAMEWORK_YAML_STAGE**
-2. Click "Upload" → Select your YAML file  
-3. In path field, type: `/analytics` (or your project name)
-4. Click "Upload" - directory created automatically!
+1. Download the YAML file above
+2. Navigate to **{current_db}.CONFIGS.FRAMEWORK_YAML_STAGE**
+3. Click "Upload" → Select your YAML file  
+4. In path field, enter a project name (e.g., `/analytics/`, `/sales_demo/`, `/customer_insights/`)
+5. Click "Upload" - directory created automatically!
 """
             st.markdown(upload_instructions)
 

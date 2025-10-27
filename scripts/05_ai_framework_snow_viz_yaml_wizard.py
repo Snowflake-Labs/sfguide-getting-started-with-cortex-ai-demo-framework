@@ -890,34 +890,14 @@ def render_yaml_generation_tab(session, db: str, sc: str, selected_name: str, di
         
         with st.expander("📋 Complete Upload Instructions", expanded=True):
             upload_instructions = f"""
-**Next Steps:**
-1. Download the YAML file above
-2. Upload to **CORTEX_AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE** with a project directory
-3. Open Snow Viz (Step 6) and select your project
-4. View your interactive dashboard!
-
----
-
-💡 **Project Directory Tips:**
-
-Create a meaningful directory name that matches your use case:
-
-- **techcorp_orders** - Customer order dashboards
-- **analytics** - General analytics dashboards
-- **sales** - Sales performance tracking
-- **customer_insights** - Customer behavior analysis
-- **financial** - Financial reporting
-
----
-
-🖱️ **Snowsight UI Upload:**
+**Snowsight UI Upload:**
 
 1. Navigate to **CORTEX_AI_FRAMEWORK_DB.CONFIGS.VISUALIZATION_YAML_STAGE**
 2. Click "Upload" → Select your YAML file  
-3. In path field, type: `techcorp_orders` (or your project name)
+3. In path field, enter a project name (e.g., `/customer_orders/`, `/dashboards/`, `/analytics/`)
 4. Click "Upload" - directory created automatically!
 
-💡 **Done!** Your dashboard is ready for Snow Viz (Step 6)
+💡 **Done!** Your dashboard is ready for Snow Viz (App 6)
 """
             st.markdown(upload_instructions)
 
