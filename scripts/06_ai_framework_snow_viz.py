@@ -192,7 +192,24 @@ def run_sql(sql: str) -> pd.DataFrame:
     if session is None:
         st.error("No active Snowflake session. Run this in Snowflake Streamlit.")
         return pd.DataFrame()
-    return session.sql(sql).to_pandas()
+    try:
+        return session.sql(sql).to_pandas()
+    except Exception as e:
+        error_msg = str(e)
+        # Parse common errors for user-friendly messages
+        if "does not exist or not authorized" in error_msg:
+            if "Database" in error_msg:
+                st.error("❌ **Database not found.** Please ensure your YAML configuration uses `CORTEX_AI_FRAMEWORK_DB` as the database name.")
+            elif "Table" in error_msg or "Object" in error_msg:
+                st.error("❌ **Table not found.** Make sure you've run the Synthetic Data Generator and Structured Tables apps to create your data tables.")
+            else:
+                st.error(f"❌ **Permission or object not found:** {error_msg}")
+        elif "syntax error" in error_msg.lower():
+            st.error(f"❌ **SQL syntax error:** {error_msg}")
+        else:
+            st.error(f"❌ **Query failed:** {error_msg}")
+        st.info("💡 **Tip:** Verify your table exists in `CORTEX_AI_FRAMEWORK_DB.SILVER_LAYER` and you have the correct permissions.")
+        return pd.DataFrame()
 
 
 def build_metric_sql(metric_sql_expr: str, base_from: str, where_clause: str) -> str:

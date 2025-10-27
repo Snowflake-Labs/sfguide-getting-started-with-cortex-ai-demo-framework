@@ -274,17 +274,33 @@ def render_query_block(
     # --- Step 2: Run Query ---
     run_button_key = f"run_{block_id}"
     if st.button("Run Query", key=run_button_key):
-        df = session.sql(query_code).to_pandas()
-        st.session_state[block_id] = df
-        if save_as:
-            if not df.empty:
-                if save_as.upper() in df.columns:
-                    st.session_state[save_as] = df.iloc[0][save_as.upper()]
+        try:
+            df = session.sql(query_code).to_pandas()
+            st.session_state[block_id] = df
+            if save_as:
+                if not df.empty:
+                    if save_as.upper() in df.columns:
+                        st.session_state[save_as] = df.iloc[0][save_as.upper()]
+                    else:
+                        st.session_state[save_as] = df.iloc[0, 0]
                 else:
-                    st.session_state[save_as] = df.iloc[0, 0]
+                    st.session_state[save_as] = None
+            st.success(f"{len(df)} rows returned.")
+        except Exception as e:
+            error_msg = str(e)
+            # Parse common errors for user-friendly messages
+            if "does not exist or not authorized" in error_msg:
+                if "Database" in error_msg:
+                    st.error("❌ **Database not found.** Please update your SQL query to use `CORTEX_AI_FRAMEWORK_DB` instead of the old database name.")
+                elif "Table" in error_msg or "Object" in error_msg:
+                    st.error("❌ **Table not found.** Make sure you've run the Synthetic Data Generator and Structured Tables apps first to create your data tables.")
+                else:
+                    st.error(f"❌ **Permission or object not found:** {error_msg}")
+            elif "syntax error" in error_msg.lower():
+                st.error(f"❌ **SQL syntax error.** Please check your query:\n\n{error_msg}")
             else:
-                st.session_state[save_as] = None
-        st.success(f"{len(df)} rows returned.")
+                st.error(f"❌ **Query failed:** {error_msg}")
+            st.info("💡 **Tip:** Check that your database name is `CORTEX_AI_FRAMEWORK_DB` and your tables exist in the correct schema.")
 
     
     # --- Step 3: Chart Type Selection & Rendering ---
