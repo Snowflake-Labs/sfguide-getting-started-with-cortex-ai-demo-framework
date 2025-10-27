@@ -17,12 +17,6 @@ except:
     session = None
     HAS_SNOWFLAKE_SESSION = False
 
-
-# -- SNOW-DEMO-CONFIG v1.0
-# -- SQL Worksheet to YAML Demo Configuration Generator
-# -- Creation Date: 2025-01-15
-# -- Purpose: Convert SQL worksheets into YAML configs for SNOW-DEMO harness
-
 st.set_page_config(
     page_title="SQL to YAML Converter",
     page_icon="⚙️",

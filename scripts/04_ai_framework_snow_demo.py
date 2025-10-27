@@ -7,47 +7,6 @@ from snowflake.snowpark.functions import col
 import altair as alt
 import re
 
-
-# -- LKG & Copilot / ChatGPT
-# -- V1.0 - Visualization Demo Harness
-# -- Creation Date: 2025-06-18
-
-# -- Dependency - I had to create an S3 bucket in my personal GCP instance to hold the image icons
-# -- Designed for demo's that involve lots of SQL blocks to run and demo feature etc
-# -- Generalized harness to enable you to select all your demo's that work like this 
-# -- and once their metadata is captured in YAML files you can select one and run it
-# -- This visualizer demo provides a collection of rendering widgets so you dont have to show table flatland
-# -- Options include Bar/Line, Plot, Map, Network, Metric , Table , Polygon ...
-# -- Methods included in this caller
-
-# -- SIDEBAR Functionality to see what Demo are available (load also used in MAIN functionality)
-# -- list_yaml_folders_in_stage - checks the stage to get the the subfolders ie areas
-# -- list_yaml_files_in_stage - checks the stage to get the yaml files which are all the demos available to run in this area
-# -- show_demo_info - enables you to see what the demo is you want
-# -- load_yaml_from_stage - this takes the yaml file which has the metadata for the demo and enables you to run it
-
-# -- Helper functions to call SQL in different ways and setup variables for reuse across the process
-# -- render_query_block - basically takes the section of code that is going to be run and executes it and renders with optional visualization options
-# -- resolve_variables -- used by render_query_block, Resolve all variables so we can do more sophisticated substitution within SQL queries
-# -- run_sql_batch - Cleanup Scripts Function + Generalized Initialization ---
-# -- substitute_vars -- responsible for substituting the variables in statements pre-execution
-# -- extract_variables_from_sql - creates a dictionary of all variables that have been encoded in SQL blocks using {VAR}        
-# -- parse_point_wkt - converts a string which is really a co-ordinates dictionary into proper floated values for use by the chart
-
-# -- Visualization Methods available for story telling
-# -- render_top_selling_polygon_chart - visual rendering of top selling polygon (not tested)
-# -- render_furthest_locations_chart form of a map diagram to show the furthest locations relative to the central point
-# -- render_h3_resolution_chart generates a table that shows the underlying hex values for a particular resolution
-# -- render_table_chart - traditional table data frame with little enhancements
-# -- render_metric_chart - traditional metric display - enables you to select any numeric field in single row results for viewing
-# -- render_map_chart -- uses st.map() and creates a geographical mat, have to have LATITUDE/LONGITUDE
-# -- render_network_chart - uses network (point to point graph) but needs LATITUDE_A / LONGITUDE A vs LATITUDE_B and LONGITUDE B for effective use
-# -- render_plot_chart - similar to map_chart also needs LATITUDE and LONGITUDE shows without map overlay but bubble chart with tooltips
-# -- render_line_or_bar_chart - enables you to have line chart with up to 2 metrics shown (separate axis)
-# -- overview_to_html --  Build HTML for overview as bullet points if it uses - or *
-
-
-
 st.set_page_config(
     page_title="TastyBytes From Zero to Snowflake Vignette - 5 (Collaboration)",
     page_icon="https://storage.googleapis.com/lee-demo-streamlit-icon-bucket/tastybytes.png",
