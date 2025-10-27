@@ -50,14 +50,14 @@ def setup_config_database(session) -> bool:
         db_name = get_current_database()
         
         session.sql(f"CREATE DATABASE IF NOT EXISTS {db_name}").collect()
-        session.sql(f"CREATE SCHEMA IF NOT EXISTS {db_name}.CONFIG").collect()
+        session.sql(f"CREATE SCHEMA IF NOT EXISTS {db_name}.CONFIGS").collect()
         
         # Check if table exists and get its schema
         try:
             schema_check = session.sql(f"""
                 SELECT COLUMN_NAME, DATA_TYPE 
                 FROM {db_name}.INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_SCHEMA = 'CONFIG' 
+                WHERE TABLE_SCHEMA = 'CONFIGS' 
                 AND TABLE_NAME = 'DEMO_CONFIGURATIONS'
                 AND COLUMN_NAME = 'DEMO_METADATA'
             """).collect()
@@ -73,7 +73,7 @@ def setup_config_database(session) -> bool:
                 # First, backup existing data if any
                 backup_data = []
                 try:
-                    existing_data = session.sql(f"SELECT * FROM {db_name}.CONFIG.DEMO_CONFIGURATIONS").collect()
+                    existing_data = session.sql(f"SELECT * FROM {db_name}.CONFIGS.DEMO_CONFIGURATIONS").collect()
                     for row in existing_data:
                         backup_data.append({
                             'CONFIG_ID': row['CONFIG_ID'],
@@ -85,11 +85,11 @@ def setup_config_database(session) -> bool:
                     pass  # No existing data or error reading
                 
                 # Drop and recreate with new schema
-                session.sql(f"DROP TABLE IF EXISTS {db_name}.CONFIG.DEMO_CONFIGURATIONS").collect()
+                session.sql(f"DROP TABLE IF EXISTS {db_name}.CONFIGS.DEMO_CONFIGURATIONS").collect()
                 
                 # Create table with TEXT columns
                 session.sql(f"""
-                    CREATE TABLE {db_name}.CONFIG.DEMO_CONFIGURATIONS (
+                    CREATE TABLE {db_name}.CONFIGS.DEMO_CONFIGURATIONS (
                         CONFIG_ID STRING PRIMARY KEY,
                         CONFIG_NAME STRING,
                         DEMO_METADATA TEXT,
@@ -106,7 +106,7 @@ def setup_config_database(session) -> bool:
                 for backup_row in backup_data:
                     try:
                         session.sql(f"""
-                            INSERT INTO {db_name}.CONFIG.DEMO_CONFIGURATIONS 
+                            INSERT INTO {db_name}.CONFIGS.DEMO_CONFIGURATIONS 
                             (CONFIG_ID, CONFIG_NAME, YAML_CONFIG, DEMO_METADATA, PARSED_BLOCKS, INFERRED_METADATA, SUMMARY_REPORT)
                             VALUES (?, ?, ?, '{{}}', '[]', '{{}}', '{{}}')
                         """, [
@@ -126,7 +126,7 @@ def setup_config_database(session) -> bool:
         
         # Create new table with TEXT columns including original SQL
         session.sql(f"""
-            CREATE TABLE {db_name}.CONFIG.DEMO_CONFIGURATIONS (
+            CREATE TABLE {db_name}.CONFIGS.DEMO_CONFIGURATIONS (
                 CONFIG_ID STRING PRIMARY KEY,
                 CONFIG_NAME STRING,
                 ORIGINAL_SQL TEXT,
@@ -163,7 +163,7 @@ def save_config_to_database(session, config_name: str, demo_metadata: Dict, pars
         
         # Delete existing config with same name
         session.sql(f"""
-            DELETE FROM {db_name}.CONFIG.DEMO_CONFIGURATIONS 
+            DELETE FROM {db_name}.CONFIGS.DEMO_CONFIGURATIONS 
             WHERE CONFIG_NAME = ?
         """, [config_name]).collect()
         
@@ -175,7 +175,7 @@ def save_config_to_database(session, config_name: str, demo_metadata: Dict, pars
         
         # Insert new config with all data as TEXT including original SQL
         session.sql(f"""
-            INSERT INTO {db_name}.CONFIG.DEMO_CONFIGURATIONS 
+            INSERT INTO {db_name}.CONFIGS.DEMO_CONFIGURATIONS 
             (CONFIG_ID, CONFIG_NAME, ORIGINAL_SQL, DEMO_METADATA, PARSED_BLOCKS, YAML_CONFIG, INFERRED_METADATA, SUMMARY_REPORT)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, [
@@ -206,7 +206,7 @@ def load_saved_configurations(session) -> List[Dict]:
         
         result = session.sql(f"""
             SELECT CONFIG_ID, CONFIG_NAME, CREATED_TIMESTAMP, LAST_UPDATED
-            FROM {db_name}.CONFIG.DEMO_CONFIGURATIONS
+            FROM {db_name}.CONFIGS.DEMO_CONFIGURATIONS
             ORDER BY LAST_UPDATED DESC
         """).collect()
         
@@ -239,7 +239,7 @@ def load_config_from_database(session, config_id: str) -> Optional[Dict]:
         
         result = session.sql(f"""
             SELECT CONFIG_NAME, ORIGINAL_SQL, DEMO_METADATA, PARSED_BLOCKS, YAML_CONFIG, INFERRED_METADATA, SUMMARY_REPORT
-            FROM {db_name}.CONFIG.DEMO_CONFIGURATIONS
+            FROM {db_name}.CONFIGS.DEMO_CONFIGURATIONS
             WHERE CONFIG_ID = ?
         """, [config_id]).collect()
         
